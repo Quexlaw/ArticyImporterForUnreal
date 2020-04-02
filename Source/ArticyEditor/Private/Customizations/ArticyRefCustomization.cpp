@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.  
 //
 
-#include "Slate/ArticyRefCustomization.h"
+#include "Customizations/ArticyRefCustomization.h"
 #include "IDetailChildrenBuilder.h"
 #include "DetailWidgetRow.h"
 #include "Widgets/SWidget.h"
@@ -140,7 +140,7 @@ void FArticyRefCustomization::OnClassPicked(UClass* InChosenClass)
 	ClassRestrictionButton->SetIsOpen(false, false);
 }
 
-TSharedRef<SWidget> FArticyRefCustomization::CreateClassPicker() const
+TSharedRef<SWidget> FArticyRefCustomization::CreateClassPicker()
 {
 	FClassViewerInitializationOptions ClassViewerConfig;
 	ClassViewerConfig.DisplayMode = EClassViewerDisplayMode::TreeView;

@@ -146,18 +146,18 @@ bool CodeGenerator::DeleteGeneratedAssets()
 	FAssetRegistryModule& AssetRegistry = FModuleManager::Get().GetModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	TArray<FAssetData> OutAssets;
 	AssetRegistry.Get().GetAssetsByPath(FName(*ArticyHelpers::ArticyGeneratedFolder), OutAssets, true, false);
-
+	
 	TArray<UObject*> ExistingAssets;
 	TArray<FAssetData> InvalidAssets;
-	for(FAssetData data : OutAssets)
+	for(FAssetData Data : OutAssets)
 	{
-		if (data.IsValid())
+		if (Data.IsValid())
 		{
-			UObject* Asset = data.GetAsset();
+			UObject* Asset = Data.GetAsset();
 			// if the class is missing (generated code deleted for example), the asset data will be valid but return a nullptr
 			if(!Asset)
 			{
-				InvalidAssets.Add(data);
+				InvalidAssets.Add(Data);
 				continue;
 			}
 			
@@ -225,8 +225,8 @@ void CodeGenerator::Compile(UArticyImportData* Data)
 			
 			if (bErrorInGeneratedCode)
 			{
-				const bool bCanGenerateAssets = RestorePreviousImport(Data, true, Type);
-				if(bCanGenerateAssets)
+				const bool bCanContinue = RestorePreviousImport(Data, true, Type);
+				if(bCanContinue)
 				{
 					OnCompiled(Data);
 				}
@@ -235,8 +235,8 @@ void CodeGenerator::Compile(UArticyImportData* Data)
 		// in case the compilation was neither successful nor had compile errors, revert just to be safe
 		else
 		{
-			const bool bCanGenerateAssets = RestorePreviousImport(Data, true, Type);
-			if (bCanGenerateAssets)
+			const bool bCanContinue = RestorePreviousImport(Data, true, Type);
+			if (bCanContinue)
 			{
 				OnCompiled(Data);
 			}
@@ -329,7 +329,19 @@ bool CodeGenerator::ParseForError(const FString& Log)
 
 bool CodeGenerator::RestorePreviousImport(UArticyImportData* Data, const bool& bNotifyUser, ECompilationResult::Type Reason)
 {
-	ensure(Data && Data->HasCachedVersion());
+	ensure(Data);
+
+	const FText ArticyImportErrorText = FText::FromString(TEXT("Articy import error"));
+	FText ReasonForRestoreText = FText::FromString(ECompilationResult::ToString(Reason));
+
+	if(!Data->HasCachedVersion())
+	{
+		const FText CacheNotAvailableText = FText::Format(LOCTEXT("NoCacheAvailable", "Aborting import process. No cache available to restore. Deleting import asset but leaving generated code intact. Please delete manually in Source/ArticyGenerated if necessary and rebuild. Reason: {0}."), ReasonForRestoreText);
+		OpenMsgDlgInt(EAppMsgType::Ok, CacheNotAvailableText, ArticyImportErrorText);
+		ObjectTools::DeleteAssets({ Data }, false);
+		
+		return false;
+	}
 	
 	// transfer the cached data into the current one
 	Data->ResolveCachedVersion();
@@ -337,7 +349,6 @@ bool CodeGenerator::RestorePreviousImport(UArticyImportData* Data, const bool& b
 	// attempt to restore all generated files
 	const bool bFilesRestored = RestoreCachedFiles();
 
-	FText ReasonForRestoreText = FText::FromString(ECompilationResult::ToString(Reason));
 
 	// Reason is "-1" for cancelled for some reason
 	if(Reason == -1)
@@ -349,7 +360,6 @@ bool CodeGenerator::RestorePreviousImport(UArticyImportData* Data, const bool& b
 		ReasonForRestoreText = FText::FromString(TEXT("Error in compiled articy code"));
 	}
 
-	FText ArticyImportErrorText = FText::FromString(TEXT("Articy import error"));
 	// if we succeeded, tell the user and call OnCompiled - which will then create the assets
 	if (bFilesRestored)
 	{

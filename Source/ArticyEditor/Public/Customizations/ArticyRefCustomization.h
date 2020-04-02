@@ -8,7 +8,7 @@
 #include "CoreMinimal.h"
 #include <IPropertyTypeCustomization.h>
 #include "ArticyRef.h"
-#include "SArticyRefProperty.h"
+#include "Slate/SArticyRefProperty.h"
 #include "ClassViewerFilter.h"
 #include "ClassViewerModule.h"
 #include "ArticyObject.h"
@@ -49,7 +49,7 @@ private:
 	UClass* GetClassRestriction() const;
 	FText GetChosenClassName() const;
 	void OnClassPicked(UClass* InChosenClass);
-	TSharedRef<SWidget> CreateClassPicker() const;
+	TSharedRef<SWidget> CreateClassPicker();
 
 
 private:

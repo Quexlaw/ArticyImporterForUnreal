@@ -19,7 +19,7 @@
 #include "Editor.h"
 #include "Widgets/Input/SButton.h"
 #include "Slate/UserInterfaceHelperFunctions.h"
-#include "Slate/ArticyRefCustomization.h"
+#include "Customizations/ArticyRefCustomization.h"
 
 #define LOCTEXT_NAMESPACE "ArticyRefProperty"
 
@@ -55,7 +55,7 @@ void SArticyRefProperty::Construct(const FArguments& InArgs, IPropertyHandle* In
 		.ThumbnailSize(ArticyRefPropertyConstants::ThumbnailSize.X)
 		.ThumbnailPadding(ArticyRefPropertyConstants::ThumbnailPadding.X);
 	
-	const FSlateBrush* ArticySoftwareLogo = FArticyEditorStyle::Get().GetBrush("ArticyImporter.ArticyDraftLogo.16");
+	const FSlateBrush* ArticyDraftLogo = FArticyEditorStyle::Get().GetBrush("ArticyImporter.ArticyDraft.16");
 	
 	ArticyButton = SNew(SButton)
 		.OnClicked(this, &SArticyRefProperty::OnArticyButtonClicked)
@@ -63,7 +63,7 @@ void SArticyRefProperty::Construct(const FArguments& InArgs, IPropertyHandle* In
 		.Content()
 		[
 			SNew(SImage)
-			.Image(ArticySoftwareLogo)
+			.Image(ArticyDraftLogo)
 		];
 	
 	this->ChildSlot
