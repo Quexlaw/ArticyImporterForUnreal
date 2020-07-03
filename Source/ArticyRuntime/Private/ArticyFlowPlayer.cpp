@@ -106,6 +106,11 @@ bool UArticyFlowPlayer::ShouldPauseOn(IArticyFlowObject* Node) const
 	return Node && (1 << static_cast<uint8>(Node->GetType()) & PauseOn);
 }
 
+bool UArticyFlowPlayer::ShouldPauseOn(TScriptInterface<IArticyFlowObject> Node) const
+{
+	return ShouldPauseOn(Cast<IArticyFlowObject>(Node.GetObject()));
+}
+
 UArticyDatabase* UArticyFlowPlayer::GetDB() const
 {
 	return UArticyDatabase::Get(this);
@@ -420,3 +425,20 @@ void UArticyFlowPlayer::PlayBranch(const FArticyBranch& Branch)
 	Cursor = Branch.Path.Last();
 	UpdateAvailableBranches();
 }
+
+// @ TODO ArticyFlowDebugger
+//AArticyFlowDebugger::AArticyFlowDebugger()
+//{
+//	FlowPlayer = CreateDefaultSubobject<UArticyFlowPlayer>(TEXT("Articy Flow Player"));
+//	ArticyImporterIcon = CreateDefaultSubobject<UBillboardComponent>(TEXT("Icon"));
+//
+//	auto ImporterIconFinder = ConstructorHelpers::FObjectFinder<UTexture2D>(TEXT("Texture2D'/ArticyImporter/Res/ArticyImporter64.ArticyImporter64'"));
+//	ArticyImporterIcon->SetSprite(ImporterIconFinder.Object);
+//}
+//
+//void AArticyFlowDebugger::OnConstruction(const FTransform& Transform)
+//{
+//	ensure(FlowPlayer);
+//	
+//	FlowPlayer->SetIgnoreInvalidBranches(bIgnoreInvalidBranchesOverride);
+//}

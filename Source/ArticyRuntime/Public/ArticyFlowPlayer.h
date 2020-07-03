@@ -36,14 +36,14 @@ public:
 	/**
 	 * The list of nodes this branch contains.
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Articy")
 	TArray<TScriptInterface<IArticyFlowObject>> Path;
 
 	/** This is true if all conditions along the path evaluate to true. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Articy")
 	bool bIsValid = true;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Articy")
 	int32 Index = -1;
 
 	/** Retrieve the last object in the path. */
@@ -96,6 +96,10 @@ public:
 	/** Gets the last set StartOn node */
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Start Node"), Category = "Setup")
 	FArticyRef GetStartNode() { return StartOn; }
+
+	/** Gets the last set StartOn node */
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Ignore Invalid Branches"), Category = "Setup")
+	void SetIgnoreInvalidBranches(bool bNewIgnoreInvalidBranches) { bIgnoreInvalidBranches = bNewIgnoreInvalidBranches; }
 		
 	/** Set the Cursor (current node) to this Node and updates the available branches. */
 	UFUNCTION(BlueprintCallable, Category = "Flow")
@@ -131,6 +135,9 @@ public:
 
 	/** Returns true if Node is one of the PauseOn types. */
 	bool ShouldPauseOn(IArticyFlowObject* Node) const;
+
+	UFUNCTION(BlueprintCallable, Category="Flow")
+	bool ShouldPauseOn(TScriptInterface<IArticyFlowObject> Node) const;
 	
 	/**
 	 * Get the GV instance used for expresso script execution.
@@ -310,3 +317,31 @@ void UArticyFlowPlayer::ShadowedOperation(Lambda Operation) const
 	if(ensure(ShadowLevel > 0))
 		--ShadowLevel;
 }
+
+
+// @TODO ArticyFlowDebugger. BP inheriting has an engine version, and current BP has version 4.25, which makes it incompatible with < 25. Would need to recreate in 4.20
+// due to forward compatibility, or find a way that works without uassets
+
+//UCLASS(BlueprintType, HideCategories=(Replication, Physics, Rendering, Input, Collision, Actor, LOD, Cooking))
+//class AArticyFlowDebugger : public AActor
+//{
+//	GENERATED_BODY()
+//	
+//public:
+//	AArticyFlowDebugger();
+//
+//	virtual void OnConstruction(const FTransform& Transform) override;
+//
+//public:
+//	UPROPERTY(BlueprintReadOnly, Category = "Articy")
+//	UArticyFlowPlayer* FlowPlayer = nullptr;
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Articy", meta = (ArticyClassRestriction = "ArticyNode"))
+//	FArticyRef StartOnOverride;
+//private:
+//	UPROPERTY(EditAnywhere, Category="Articy")
+//	bool bIgnoreInvalidBranchesOverride = false;
+//
+//	UPROPERTY()
+//	UBillboardComponent* ArticyImporterIcon = nullptr;
+//};
